@@ -41,12 +41,10 @@ def make_intro(intro_dir):
     
     
     command = ['/usr/bin/latex', '-output-directory=' + str(tmp_path), str(texfile)]
-    print(command)
     process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     stdout, stderr = process.communicate()
     
     command = ['/usr/bin/dvipng', '-o', str(pngfile), str(dvifile)]
-    print(command)
     process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     stdout, stderr = process.communicate()
     return pngfile
@@ -84,7 +82,6 @@ def prepare_pictures(tmp_path, num_frames_slide, pic_path, intro_dir):
     """
     Put pictures in tmp_path with a correct name (sorted)
     """
-    print(tmp_path)
     gen = name_it(tmp_path)
 
     #Part 1, introduction
@@ -92,7 +89,6 @@ def prepare_pictures(tmp_path, num_frames_slide, pic_path, intro_dir):
 
     file_list = []
     for count in range(num_frames_slide):
-        print('copy intro to')
         dest = gen.__next__() 
         shutil.copy(introfile, dest)
         file_list.append(dest)
