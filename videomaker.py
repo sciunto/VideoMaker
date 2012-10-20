@@ -23,6 +23,8 @@ import re
 import shutil
 
 
+import configparser
+
 def make_intro(intro_dir):
     """
     Make introduction png file
@@ -31,14 +33,11 @@ def make_intro(intro_dir):
     """
     tmp_path = tempfile.mkdtemp()
 
-    filename = os.path.basename(glob.glob(str(intro_dir) + '*tex')[0])
+    filename = os.path.basename(glob.glob(os.path.abspath(intro_dir) + '/*tex')[0])
     filename = os.path.splitext(filename)[0]
     texfile = os.path.join(intro_dir, filename + '.tex')
     dvifile = os.path.join(tmp_path, filename + '.dvi')
     pngfile = os.path.join(tmp_path, filename + '.png')
-    
-    with open(texfile, 'w') as texfileh:
-        texfileh.write(tex_template)
     
     
     command = ['/usr/bin/latex', '-output-directory=' + str(tmp_path), str(texfile)]
@@ -111,12 +110,17 @@ def prepare_pictures(tmp_path, num_frames_slide, pic_path, intro_dir):
 
 if __name__ == '__main__':
    
+    config = configparser.ConfigParser()
+    config.read('config.conf')
+
+
     cwd = os.getcwd()
 
-    pic_path = 'pictures/'
-    intro_dir = 'intro/'
-    fps = 10
-    intro_duration = 3 #seconds
+    #pic_path = 'pictures/'
+    intro_dir = config['intro'].get('path')
+    fps = config['movie'].getint('fps')
+    pic_path = config['movie'].get('path')
+    intro_duration = config['intro'].getint('duration')  #seconds
     num_frames_slide = fps * intro_duration
 
     #Prepare pictures in tmp dir
