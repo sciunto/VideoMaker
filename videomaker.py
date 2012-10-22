@@ -21,6 +21,7 @@ import os.path
 import subprocess
 import re
 import shutil
+import argparse
 
 
 import configparser
@@ -105,9 +106,13 @@ def prepare_pictures(tmp_path, num_frames_slide, pic_path, intro_dir):
     return file_list
 
 if __name__ == '__main__':
-   
+  
+    parser = argparse.ArgumentParser(description='', epilog='')
+    parser.add_argument('conf', help='Configuration file', metavar='CONF')
+    args = parser.parse_args()
+
     config = configparser.ConfigParser()
-    config.read('config.conf')
+    config.read(args.conf)
 
 
     cwd = os.getcwd()
