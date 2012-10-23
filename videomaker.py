@@ -85,11 +85,11 @@ def prepare_pictures(tmp_path, pic_path, num_frames_intro_slide, intro_dir, num_
     """
     gen = name_it(tmp_path)
 
+    file_list = []
     #Part 1, introduction
     if intro_dir:
         introfile = make_intro(intro_dir)
 
-        file_list = []
         for count in range(num_frames_intro_slide):
             dest = gen.__next__() 
             shutil.copy(introfile, dest)
@@ -108,7 +108,6 @@ def prepare_pictures(tmp_path, pic_path, num_frames_intro_slide, intro_dir, num_
     if end_dir:
         endfile = make_intro(end_dir)
 
-        file_list = []
         for count in range(num_frames_end_slide):
             dest = gen.__next__() 
             shutil.copy(endfile, dest)
