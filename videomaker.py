@@ -89,9 +89,10 @@ class VideoSection():
     """
     Gather data about a video section
     """
-    def __init__(self, path, num_frame_slide):
+    def __init__(self, path, num_frame_slide, every=1):
         self.path = path
         self.num_frame_slide = num_frame_slide
+        self.every = every
 
 
 def prepare_pictures(tmp_path, opening, bodies, ending):
@@ -118,7 +119,7 @@ def prepare_pictures(tmp_path, opening, bodies, ending):
         pictures = sorted(os.listdir(body.path), key=alphanum_key)
         pictures = [os.path.join(body.path, item) for item in pictures]
 
-        for item in pictures:
+        for item in pictures[::body.every]:
             shutil.copy(item, gen.__next__())
 
     #Part 3, ending
@@ -152,7 +153,8 @@ if __name__ == '__main__':
 
     #Body
     pic_paths = config['body'].get('path').split(',')
-    body_sections = [VideoSection(path, config['body'].getint('duration', 0)) for path in pic_paths] #FIXME
+    every = config['body'].getint('every', '1')
+    body_sections = [VideoSection(path, config['body'].getint('duration', 0), every) for path in pic_paths] 
 
     #Ending
     end_duration = config['ending'].getint('duration', 0)  #seconds
