@@ -26,7 +26,7 @@ import argparse
 
 import configparser
 
-def make_intro(intro_dir):
+def make_slide(intro_dir):
     """
     Make introduction png file
 
@@ -34,8 +34,8 @@ def make_intro(intro_dir):
     """
     tmp_path = tempfile.mkdtemp()
 
-    filename = os.path.basename(glob.glob(os.path.abspath(intro_dir) + '/*tex')[0])
-    filename = os.path.splitext(filename)[0]
+    filename = os.path.basename(glob.glob(os.path.abspath(intro_dir) + '/*tex')[0]) #TODO check length
+    filename = os.path.splitext(filename)[0] 
     texfile = os.path.join(intro_dir, filename + '.tex')
     dvifile = os.path.join(tmp_path, filename + '.dvi')
     pngfile = os.path.join(tmp_path, filename + '.png')
@@ -79,41 +79,43 @@ def alphanum_key(s):
 ##############Natural sorting
 
 
-def prepare_pictures(tmp_path, pic_path, num_frames_intro_slide, intro_dir, num_frames_end_slide, end_dir):
+def prepare_pictures(tmp_path, pic_paths, num_frames_intro_slide, intro_dir, num_frames_end_slide, end_dir):
     """
     Put pictures in tmp_path with a correct name (sorted)
     """
     gen = name_it(tmp_path)
 
-    file_list = []
     #Part 1, introduction
     if intro_dir:
-        introfile = make_intro(intro_dir)
+        introfile = make_slide(intro_dir)
 
         for count in range(num_frames_intro_slide):
             dest = gen.__next__() 
             shutil.copy(introfile, dest)
-            file_list.append(dest)
 
     #Part 2, pictures
-    pictures = sorted(os.listdir(pic_path), key=alphanum_key)
-    pictures = [os.path.join(pic_path, item) for item in pictures]
+    for pic_path in pic_paths:
+        slide = make_slide(pic_path)
+        for count in range(20): #FIXME
+            dest = gen.__next__() 
+            shutil.copy(slide, dest)
 
-    for item in pictures:
-        dest = gen.__next__() 
-        shutil.copy(item, dest)
-        file_list.append(dest)
+
+        pictures = sorted(os.listdir(pic_path), key=alphanum_key)
+        pictures = [os.path.join(pic_path, item) for item in pictures]
+
+        for item in pictures:
+            dest = gen.__next__() 
+            shutil.copy(item, dest)
 
     #Part 3, end
     if end_dir:
-        endfile = make_intro(end_dir)
+        endfile = make_slide(end_dir)
 
         for count in range(num_frames_end_slide):
             dest = gen.__next__() 
             shutil.copy(endfile, dest)
-            file_list.append(dest)
 
-    return file_list
 
 if __name__ == '__main__':
   
@@ -127,12 +129,19 @@ if __name__ == '__main__':
 
     cwd = os.getcwd()
 
-    #pic_path = 'pictures/'
-    open_dir = config['opening'].get('path', None)
+    #Movie section
     fps = config['movie'].getint('fps')
-    pic_path = config['movie'].get('path')
+    output = config['movie'].get('output', 'output')
+
+    #Opening
+    open_dir = config['opening'].get('path', None)
     open_duration = config['opening'].getint('duration', 0)  #seconds
     num_frames_open_slide = fps * open_duration
+
+    #Body
+    pic_paths = config['body'].get('path').split(',')
+
+    #Ending
     end_dir = config['ending'].get('path', None)
     end_duration = config['ending'].getint('duration', 0)  #seconds
     num_frames_end_slide = fps * end_duration
@@ -140,7 +149,7 @@ if __name__ == '__main__':
     #Prepare pictures in tmp dir
     tmp_path = tempfile.mkdtemp()
 
-    pictures = prepare_pictures(tmp_path, pic_path, num_frames_open_slide, open_dir, num_frames_end_slide, end_dir)
+    pictures = prepare_pictures(tmp_path, pic_paths, num_frames_open_slide, open_dir, num_frames_end_slide, end_dir)
   
     #Encode the movie
     os.chdir(tmp_path)
@@ -150,4 +159,4 @@ if __name__ == '__main__':
     stdout, stderr = process.communicate()
 
     #Copy the movie
-    shutil.copy('output.avi', cwd)
+    shutil.copy('output.avi', os.path.join(cwd, output + '.avi'))
