@@ -79,7 +79,7 @@ def alphanum_key(s):
 ##############Natural sorting
 
 
-def prepare_pictures(tmp_path, num_frames_slide, pic_path, intro_dir):
+def prepare_pictures(tmp_path, pic_path, num_frames_slide, intro_dir):
     """
     Put pictures in tmp_path with a correct name (sorted)
     """
@@ -118,16 +118,18 @@ if __name__ == '__main__':
     cwd = os.getcwd()
 
     #pic_path = 'pictures/'
-    intro_dir = config['intro'].get('path')
+    open_dir = config['opening'].get('path')
     fps = config['movie'].getint('fps')
     pic_path = config['movie'].get('path')
-    intro_duration = config['intro'].getint('duration')  #seconds
-    num_frames_slide = fps * intro_duration
+    open_duration = config['opening'].getint('duration')  #seconds
+    num_frames_open_slide = fps * open_duration
+    end_duration = config['ending'].getint('duration')  #seconds
+    num_frames_end_slide = fps * end_duration
 
     #Prepare pictures in tmp dir
     tmp_path = tempfile.mkdtemp()
 
-    pictures = prepare_pictures(tmp_path, num_frames_slide, pic_path, intro_dir)
+    pictures = prepare_pictures(tmp_path, pic_path, num_frames_open_slide, open_dir, num_frames_end_slide, end_dir)
   
     #Encode the movie
     os.chdir(tmp_path)
