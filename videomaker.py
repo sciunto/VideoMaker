@@ -86,13 +86,14 @@ def prepare_pictures(tmp_path, pic_path, num_frames_intro_slide, intro_dir, num_
     gen = name_it(tmp_path)
 
     #Part 1, introduction
-    introfile = make_intro(intro_dir)
+    if intro_dir:
+        introfile = make_intro(intro_dir)
 
-    file_list = []
-    for count in range(num_frames_intro_slide):
-        dest = gen.__next__() 
-        shutil.copy(introfile, dest)
-        file_list.append(dest)
+        file_list = []
+        for count in range(num_frames_intro_slide):
+            dest = gen.__next__() 
+            shutil.copy(introfile, dest)
+            file_list.append(dest)
 
     #Part 2, pictures
     pictures = sorted(os.listdir(pic_path), key=alphanum_key)
@@ -104,13 +105,14 @@ def prepare_pictures(tmp_path, pic_path, num_frames_intro_slide, intro_dir, num_
         file_list.append(dest)
 
     #Part 3, end
-    endfile = make_intro(end_dir)
+    if end_dir:
+        endfile = make_intro(end_dir)
 
-    file_list = []
-    for count in range(num_frames_end_slide):
-        dest = gen.__next__() 
-        shutil.copy(endfile, dest)
-        file_list.append(dest)
+        file_list = []
+        for count in range(num_frames_end_slide):
+            dest = gen.__next__() 
+            shutil.copy(endfile, dest)
+            file_list.append(dest)
 
     return file_list
 
@@ -127,13 +129,13 @@ if __name__ == '__main__':
     cwd = os.getcwd()
 
     #pic_path = 'pictures/'
-    open_dir = config['opening'].get('path')
+    open_dir = config['opening'].get('path', None)
     fps = config['movie'].getint('fps')
     pic_path = config['movie'].get('path')
-    open_duration = config['opening'].getint('duration')  #seconds
+    open_duration = config['opening'].getint('duration', 0)  #seconds
     num_frames_open_slide = fps * open_duration
-    end_dir = config['ending'].get('path')
-    end_duration = config['ending'].getint('duration')  #seconds
+    end_dir = config['ending'].get('path', None)
+    end_duration = config['ending'].getint('duration', 0)  #seconds
     num_frames_end_slide = fps * end_duration
 
     #Prepare pictures in tmp dir
