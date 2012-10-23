@@ -147,7 +147,7 @@ if __name__ == '__main__':
 
     #Body
     pic_paths = config['body'].get('path').split(',')
-    body_sections = [VideoSection(path, 10) for path in pic_paths] #FIXME
+    body_sections = [VideoSection(path, config['body'].getint('duration', 0)) for path in pic_paths] #FIXME
 
     #Ending
     end_duration = config['ending'].getint('duration', 0)  #seconds
