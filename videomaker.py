@@ -79,7 +79,7 @@ def alphanum_key(s):
 ##############Natural sorting
 
 
-def prepare_pictures(tmp_path, pic_path, num_frames_slide, intro_dir):
+def prepare_pictures(tmp_path, pic_path, num_frames_intro_slide, intro_dir, num_frames_end_slide, end_dir):
     """
     Put pictures in tmp_path with a correct name (sorted)
     """
@@ -89,7 +89,7 @@ def prepare_pictures(tmp_path, pic_path, num_frames_slide, intro_dir):
     introfile = make_intro(intro_dir)
 
     file_list = []
-    for count in range(num_frames_slide):
+    for count in range(num_frames_intro_slide):
         dest = gen.__next__() 
         shutil.copy(introfile, dest)
         file_list.append(dest)
@@ -101,6 +101,15 @@ def prepare_pictures(tmp_path, pic_path, num_frames_slide, intro_dir):
     for item in pictures:
         dest = gen.__next__() 
         shutil.copy(item, dest)
+        file_list.append(dest)
+
+    #Part 3, end
+    endfile = make_intro(end_dir)
+
+    file_list = []
+    for count in range(num_frames_end_slide):
+        dest = gen.__next__() 
+        shutil.copy(endfile, dest)
         file_list.append(dest)
 
     return file_list
@@ -123,6 +132,7 @@ if __name__ == '__main__':
     pic_path = config['movie'].get('path')
     open_duration = config['opening'].getint('duration')  #seconds
     num_frames_open_slide = fps * open_duration
+    end_dir = config['ending'].get('path')
     end_duration = config['ending'].getint('duration')  #seconds
     num_frames_end_slide = fps * end_duration
 
