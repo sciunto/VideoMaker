@@ -33,9 +33,15 @@ def make_slide(intro_dir):
     :returns: png file path
     """
     tmp_path = tempfile.mkdtemp()
+    
+    tex_glob = glob.glob(os.path.abspath(intro_dir) + '/*tex')
+    if tex_glob == []:
+        return None
+    if len(tex_glob) > 1:
+        print('Error, non uniq tex file in %s' % intro_dir)
+        return None
 
-    filename = os.path.basename(glob.glob(os.path.abspath(intro_dir) + '/*tex')[0]) #TODO check length
-    filename = os.path.splitext(filename)[0] 
+    filename = os.path.splitext(os.path.basename(tex_glob[0]))[0] 
     texfile = os.path.join(intro_dir, filename + '.tex')
     dvifile = os.path.join(tmp_path, filename + '.dvi')
     pngfile = os.path.join(tmp_path, filename + '.png')
@@ -98,31 +104,30 @@ def prepare_pictures(tmp_path, opening, bodies, ending):
     if opening.path:
         introfile = make_slide(opening.path)
 
-        for count in range(opening.num_frame_slide):
-            #dest = gen.__next__() 
-            shutil.copy(introfile, gen.__next__())
+        if introfile:
+            for count in range(opening.num_frame_slide):
+                shutil.copy(introfile, gen.__next__())
 
     #Part 2, body
     for body in bodies:
         slide = make_slide(body.path)
-        for count in range(body.num_frame_slide): 
-            #dest = gen.__next__() 
-            shutil.copy(slide, gen.__next__())
+        if slide:
+            for count in range(body.num_frame_slide): 
+                shutil.copy(slide, gen.__next__())
 
         pictures = sorted(os.listdir(body.path), key=alphanum_key)
         pictures = [os.path.join(body.path, item) for item in pictures]
 
         for item in pictures:
-            #dest = gen.__next__() 
             shutil.copy(item, gen.__next__())
 
     #Part 3, ending
     if ending.path:
         endfile = make_slide(ending.path)
-
-        for count in range(ending.num_frame_slide):
-            #dest = gen.__next__() 
-            shutil.copy(endfile, gen.__next__())
+        
+        if endfile:
+            for count in range(ending.num_frame_slide):
+                shutil.copy(endfile, gen.__next__())
 
 
 if __name__ == '__main__':
