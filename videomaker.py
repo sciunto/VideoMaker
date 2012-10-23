@@ -79,42 +79,50 @@ def alphanum_key(s):
 ##############Natural sorting
 
 
-def prepare_pictures(tmp_path, pic_paths, num_frames_intro_slide, intro_dir, num_frames_end_slide, end_dir):
+class VideoSection():
+    """
+    Gather data about a video section
+    """
+    def __init__(self, path, num_frame_slide):
+        self.path = path
+        self.num_frame_slide = num_frame_slide
+
+
+def prepare_pictures(tmp_path, opening, bodies, ending):
     """
     Put pictures in tmp_path with a correct name (sorted)
     """
     gen = name_it(tmp_path)
 
-    #Part 1, introduction
-    if intro_dir:
-        introfile = make_slide(intro_dir)
+    #Part 1, opening
+    if opening.path:
+        introfile = make_slide(opening.path)
 
-        for count in range(num_frames_intro_slide):
-            dest = gen.__next__() 
-            shutil.copy(introfile, dest)
+        for count in range(opening.num_frame_slide):
+            #dest = gen.__next__() 
+            shutil.copy(introfile, gen.__next__())
 
-    #Part 2, pictures
-    for pic_path in pic_paths:
-        slide = make_slide(pic_path)
-        for count in range(20): #FIXME
-            dest = gen.__next__() 
-            shutil.copy(slide, dest)
+    #Part 2, body
+    for body in bodies:
+        slide = make_slide(body.path)
+        for count in range(body.num_frame_slide): 
+            #dest = gen.__next__() 
+            shutil.copy(slide, gen.__next__())
 
-
-        pictures = sorted(os.listdir(pic_path), key=alphanum_key)
-        pictures = [os.path.join(pic_path, item) for item in pictures]
+        pictures = sorted(os.listdir(body.path), key=alphanum_key)
+        pictures = [os.path.join(body.path, item) for item in pictures]
 
         for item in pictures:
-            dest = gen.__next__() 
-            shutil.copy(item, dest)
+            #dest = gen.__next__() 
+            shutil.copy(item, gen.__next__())
 
-    #Part 3, end
-    if end_dir:
-        endfile = make_slide(end_dir)
+    #Part 3, ending
+    if ending.path:
+        endfile = make_slide(ending.path)
 
-        for count in range(num_frames_end_slide):
-            dest = gen.__next__() 
-            shutil.copy(endfile, dest)
+        for count in range(ending.num_frame_slide):
+            #dest = gen.__next__() 
+            shutil.copy(endfile, gen.__next__())
 
 
 if __name__ == '__main__':
@@ -134,22 +142,21 @@ if __name__ == '__main__':
     output = config['movie'].get('output', 'output')
 
     #Opening
-    open_dir = config['opening'].get('path', None)
     open_duration = config['opening'].getint('duration', 0)  #seconds
-    num_frames_open_slide = fps * open_duration
+    opening_section = VideoSection(config['opening'].get('path', None), fps * open_duration)
 
     #Body
     pic_paths = config['body'].get('path').split(',')
+    body_sections = [VideoSection(path, 10) for path in pic_paths] #FIXME
 
     #Ending
-    end_dir = config['ending'].get('path', None)
     end_duration = config['ending'].getint('duration', 0)  #seconds
-    num_frames_end_slide = fps * end_duration
+    end_section = VideoSection(config['ending'].get('path', None), fps * end_duration)
 
     #Prepare pictures in tmp dir
     tmp_path = tempfile.mkdtemp()
 
-    pictures = prepare_pictures(tmp_path, pic_paths, num_frames_open_slide, open_dir, num_frames_end_slide, end_dir)
+    prepare_pictures(tmp_path, opening_section, body_sections, end_section)
   
     #Encode the movie
     os.chdir(tmp_path)
@@ -160,3 +167,5 @@ if __name__ == '__main__':
 
     #Copy the movie
     shutil.copy('output.avi', os.path.join(cwd, output + '.avi'))
+
+
