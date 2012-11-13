@@ -1,0 +1,9 @@
+How to release
+==============
+
+* Update CHANGELOG
+* Update doc/conf.py
+* Update the file info.py
+* Build doc, push it
+* Create a tarball
+    git archive master | bzip2 > VideoMaker-x.y.tar.bz2
