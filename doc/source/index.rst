@@ -25,6 +25,10 @@ How to install
 
     python setup.py install --root=/usr/local/bin
 
+You must install before:
+
+* python3
+* latex, dvipng, beamer class...
 
 How to run
 ==========
