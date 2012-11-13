@@ -20,6 +20,21 @@ Contents:
 
 
 
+How to install
+==============
+
+    python setup.py install --root=/usr/local/bin
+
+
+How to run
+==========
+
+An example of the configuration file and content of directories is available in example/
+
+    videomaker.py config.conf
+
+
+
 Indices and tables
 ==================
 
