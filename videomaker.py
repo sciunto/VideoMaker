@@ -26,12 +26,14 @@ import argparse
 
 import configparser
 
-def make_slide(intro_dir):
+def make_slide(intro_dir, resolution=(1200,800)):
     """
     Make introduction png file
 
     :returns: png file path
     """
+    resol = str(resolution[0]) + 'x' + str(resolution[1])
+
     tmp_path = tempfile.mkdtemp()
     
     tex_glob = glob.glob(os.path.abspath(intro_dir) + '/*tex')
@@ -44,14 +46,17 @@ def make_slide(intro_dir):
     filename = os.path.splitext(os.path.basename(tex_glob[0]))[0] 
     texfile = os.path.join(intro_dir, filename + '.tex')
     dvifile = os.path.join(tmp_path, filename + '.dvi')
+    pdffile = os.path.join(tmp_path, filename + '.pdf')
     pngfile = os.path.join(tmp_path, filename + '.png')
     
     
-    command = ['/usr/bin/latex', '-output-directory=' + str(tmp_path), str(texfile)]
+    #command = ['/usr/bin/latex', '-output-directory=' + str(tmp_path), str(texfile)]
+    command = ['/usr/bin/pdflatex', '-output-directory=' + str(tmp_path), str(texfile)]
     process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     stdout, stderr = process.communicate()
-    
-    command = ['/usr/bin/dvipng', '-o', str(pngfile), str(dvifile)]
+   
+    command = ['/usr/bin/convert', '-density', '600', str(pdffile), '-resize', resol,  str(pngfile)]
+    #command = ['/usr/bin/dvipng', '-o', str(pngfile), str(dvifile)]
     process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     stdout, stderr = process.communicate()
     return pngfile
