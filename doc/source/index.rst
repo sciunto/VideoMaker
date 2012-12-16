@@ -7,7 +7,8 @@ Welcome to VideoMaker's documentation!
 ======================================
 
 :Author: François Boulogne
-:Source code: `github.com project <https://github.com/sciunto/VideoMaker>`_
+:Download: `Stable version <http://sciunto.org/source/>`_
+:Developer's corner: `github.com project <https://github.com/sciunto/VideoMaker>`_
 :Generated: |today|
 :License: GPL v3
 :Version: |release|
