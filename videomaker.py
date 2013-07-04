@@ -216,3 +216,5 @@ if __name__ == '__main__':
 
     #Copy the movie
     shutil.copy('output.mpg', os.path.join(cwd, output + '.mpg'))
+    #Delete the tmp dir
+    shutil.retree(tmp_path)
