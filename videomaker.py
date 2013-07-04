@@ -37,7 +37,7 @@ def make_slide(intro_dir, resolution=(1200,800)):
     resol = str(resolution[0]) + 'x' + str(resolution[1])
 
     tmp_path = tempfile.mkdtemp()
-    
+
     tex_glob = glob.glob(os.path.abspath(intro_dir) + '/*tex')
     if tex_glob == []:
         return None
@@ -45,18 +45,17 @@ def make_slide(intro_dir, resolution=(1200,800)):
         print('Error, non uniq tex file in %s' % intro_dir)
         return None
 
-    filename = os.path.splitext(os.path.basename(tex_glob[0]))[0] 
+    filename = os.path.splitext(os.path.basename(tex_glob[0]))[0]
     texfile = os.path.join(intro_dir, filename + '.tex')
     dvifile = os.path.join(tmp_path, filename + '.dvi')
     pdffile = os.path.join(tmp_path, filename + '.pdf')
     pngfile = os.path.join(tmp_path, filename + '.png')
-    
-    
+
     #command = ['/usr/bin/latex', '-output-directory=' + str(tmp_path), str(texfile)]
     command = ['/usr/bin/pdflatex', '-output-directory=' + str(tmp_path), str(texfile)]
     process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     stdout, stderr = process.communicate()
-   
+
     command = ['/usr/bin/convert', '-density', '600', str(pdffile), '-resize', resol,  str(pngfile)]
     #command = ['/usr/bin/dvipng', '-o', str(pngfile), str(dvifile)]
     process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
@@ -66,7 +65,7 @@ def make_slide(intro_dir, resolution=(1200,800)):
 def name_it(tmp_path):
     """
     Iterator returning a picture name located in tmp_path
-    
+
     :param tmp_path:
     :returns: iterator
     """
@@ -85,7 +84,7 @@ def tryint(s):
         return int(s)
     except:
         return s
-     
+
 def alphanum_key(s):
     """ Turn a string into a list of string and number chunks.
         "z23a" -> ["z", 23, "a"]
@@ -129,7 +128,7 @@ def prepare_pictures(tmp_path, opening, bodies, ending):
     for body in bodies:
         slide = make_slide(body.path, resolution)
         if slide:
-            for count in range(body.num_frame_slide): 
+            for count in range(body.num_frame_slide):
                 shutil.copy(slide, gen.__next__())
 
         #TODO: for each picture:
@@ -143,15 +142,20 @@ def prepare_pictures(tmp_path, opening, bodies, ending):
 
     #Part 3, ending
     if ending.path:
+<<<<<<< HEAD:src/videomaker.py
+        endfile = make_slide(ending.path)
+
+=======
         endfile = make_slide(ending.path, resolution)
-        
+
+>>>>>>> db29ee3863b8d84bb1bbbe5fae8b6ea742583f29:videomaker.py
         if endfile:
             for count in range(ending.num_frame_slide):
                 shutil.copy(endfile, gen.__next__())
 
 
 if __name__ == '__main__':
-  
+
     parser = argparse.ArgumentParser(description='', epilog='')
     parser.add_argument('conf', help='Configuration file', metavar='CONF')
     args = parser.parse_args()
@@ -173,7 +177,7 @@ if __name__ == '__main__':
     #Body
     pic_paths = config['body'].get('path').split(',')
     every = config['body'].getint('every', '1')
-    body_sections = [VideoSection(path, config['body'].getint('duration', 0), every) for path in pic_paths] 
+    body_sections = [VideoSection(path, config['body'].getint('duration', 0), every) for path in pic_paths]
 
     #Ending
     end_duration = config['ending'].getint('duration', 0)  #seconds
@@ -183,10 +187,10 @@ if __name__ == '__main__':
     tmp_path = tempfile.mkdtemp()
 
     prepare_pictures(tmp_path, opening_section, body_sections, end_section)
-  
+
     #Encode the movie
     os.chdir(tmp_path)
-    command = ['mencoder', 'mf://*', '-mf', 'fps='+str(fps), '-o', 'output.avi', 
+    command = ['mencoder', 'mf://*', '-mf', 'fps='+str(fps), '-o', 'output.avi',
         '-ovc', 'lavc', '-lavcopts', 'vcodec=msmpeg4v2:vbitrate=800']
     process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     stdout, stderr = process.communicate()
