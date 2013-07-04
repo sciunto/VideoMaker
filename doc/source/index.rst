@@ -7,7 +7,8 @@ Welcome to VideoMaker's documentation!
 ======================================
 
 :Author: François Boulogne
-:Source code: `github.com project <https://github.com/sciunto/VideoMaker>`_
+:Download: `Stable version <http://sciunto.org/source/>`_
+:Developer's corner: `github.com project <https://github.com/sciunto/VideoMaker>`_
 :Generated: |today|
 :License: GPL v3
 :Version: |release|
@@ -25,6 +26,10 @@ How to install
 
     python setup.py install --root=/usr/local/bin
 
+You must install before:
+
+* python3
+* latex, dvipng, beamer class...
 
 How to run
 ==========

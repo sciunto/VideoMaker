@@ -26,12 +26,16 @@ import argparse
 
 import configparser
 
-def make_slide(intro_dir):
+def make_slide(intro_dir, resolution=(1200,800)):
     """
-    Make introduction png file
+    Make introduction png files
 
+    :param intro_dir:
+    :param resolution: picture resolution of the slides
     :returns: png file path
     """
+    resol = str(resolution[0]) + 'x' + str(resolution[1])
+
     tmp_path = tempfile.mkdtemp()
 
     tex_glob = glob.glob(os.path.abspath(intro_dir) + '/*tex')
@@ -44,14 +48,16 @@ def make_slide(intro_dir):
     filename = os.path.splitext(os.path.basename(tex_glob[0]))[0]
     texfile = os.path.join(intro_dir, filename + '.tex')
     dvifile = os.path.join(tmp_path, filename + '.dvi')
+    pdffile = os.path.join(tmp_path, filename + '.pdf')
     pngfile = os.path.join(tmp_path, filename + '.png')
 
-
-    command = ['/usr/bin/latex', '-output-directory=' + str(tmp_path), str(texfile)]
+    #command = ['/usr/bin/latex', '-output-directory=' + str(tmp_path), str(texfile)]
+    command = ['/usr/bin/pdflatex', '-output-directory=' + str(tmp_path), str(texfile)]
     process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     stdout, stderr = process.communicate()
 
-    command = ['/usr/bin/dvipng', '-o', str(pngfile), str(dvifile)]
+    command = ['/usr/bin/convert', '-density', '600', str(pdffile), '-resize', resol,  str(pngfile)]
+    #command = ['/usr/bin/dvipng', '-o', str(pngfile), str(dvifile)]
     process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     stdout, stderr = process.communicate()
     return pngfile
@@ -59,6 +65,9 @@ def make_slide(intro_dir):
 def name_it(tmp_path):
     """
     Iterator returning a picture name located in tmp_path
+
+    :param tmp_path:
+    :returns: iterator
     """
     i = 0
     while True:
@@ -98,12 +107,18 @@ class VideoSection():
 def prepare_pictures(tmp_path, opening, bodies, ending):
     """
     Put pictures in tmp_path with a correct name (sorted)
+
+    :param tmp_path:
+    :param opening:
+    :param bodies:
+    :param ending:
     """
+    resolution = (1200, 800)
     gen = name_it(tmp_path)
 
     #Part 1, opening
     if opening.path:
-        introfile = make_slide(opening.path)
+        introfile = make_slide(opening.path, resolution)
 
         if introfile:
             for count in range(opening.num_frame_slide):
@@ -111,11 +126,14 @@ def prepare_pictures(tmp_path, opening, bodies, ending):
 
     #Part 2, body
     for body in bodies:
-        slide = make_slide(body.path)
+        slide = make_slide(body.path, resolution)
         if slide:
             for count in range(body.num_frame_slide):
                 shutil.copy(slide, gen.__next__())
 
+        #TODO: for each picture:
+        # * resize in order that the resolution is in the resolution defined above
+        # * Extend the picture (background color) to have exactly the same resolution
         pictures = sorted(os.listdir(body.path), key=alphanum_key)
         pictures = [os.path.join(body.path, item) for item in pictures]
 
@@ -124,8 +142,13 @@ def prepare_pictures(tmp_path, opening, bodies, ending):
 
     #Part 3, ending
     if ending.path:
+<<<<<<< HEAD:src/videomaker.py
         endfile = make_slide(ending.path)
 
+=======
+        endfile = make_slide(ending.path, resolution)
+
+>>>>>>> db29ee3863b8d84bb1bbbe5fae8b6ea742583f29:videomaker.py
         if endfile:
             for count in range(ending.num_frame_slide):
                 shutil.copy(endfile, gen.__next__())
