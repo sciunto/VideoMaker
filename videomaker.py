@@ -22,11 +22,11 @@ import subprocess
 import re
 import shutil
 import argparse
-
-
 import configparser
+import logging
 
-def make_slide(intro_dir, resolution=(1200,800)):
+
+def make_slide(intro_dir, resolution=(1200, 800)):
     """
     Make introduction png files
 
@@ -62,6 +62,7 @@ def make_slide(intro_dir, resolution=(1200,800)):
     stdout, stderr = process.communicate()
     return pngfile
 
+
 def name_it(tmp_path):
     """
     Iterator returning a picture name located in tmp_path
@@ -85,11 +86,12 @@ def tryint(s):
     except:
         return s
 
+
 def alphanum_key(s):
     """ Turn a string into a list of string and number chunks.
         "z23a" -> ["z", 23, "a"]
     """
-    return [ tryint(c) for c in re.split('([0-9]+)', s) ]
+    return [tryint(c) for c in re.split('([0-9]+)', s)]
 
 ##############Natural sorting
 
@@ -157,11 +159,24 @@ if __name__ == '__main__':
 
     parser = argparse.ArgumentParser(description='', epilog='')
     parser.add_argument('conf', help='Configuration file', metavar='CONF')
+    parser.add_argument('-d', '--debug', action='store_true',
+                        default=False, help='Run in debug mode')
+
     args = parser.parse_args()
+
+    if args.debug:
+        llevel = logging.DEBUG
+    else:
+        llevel = logging.INFO
+    logger = logging.getLogger()
+    logger.setLevel(llevel)
+
+    steam_handler = logging.StreamHandler()
+    steam_handler.setLevel(llevel)
+    logger.addHandler(steam_handler)
 
     config = configparser.ConfigParser()
     config.read(args.conf)
-
 
     cwd = os.getcwd()
 
@@ -170,7 +185,7 @@ if __name__ == '__main__':
     output = config['movie'].get('output', 'output')
 
     #Opening
-    open_duration = config['opening'].getint('duration', 0)  #seconds
+    open_duration = config['opening'].getint('duration', 0)  # seconds
     opening_section = VideoSection(config['opening'].get('path', None), fps * open_duration)
 
     #Body
@@ -180,7 +195,7 @@ if __name__ == '__main__':
     body_sections = [VideoSection(path, config['body'].getint('duration', 0), every, repeat) for path in pic_paths]
 
     #Ending
-    end_duration = config['ending'].getint('duration', 0)  #seconds
+    end_duration = config['ending'].getint('duration', 0)  # seconds
     end_section = VideoSection(config['ending'].get('path', None), fps * end_duration)
 
     #Prepare pictures in tmp dir
@@ -191,11 +206,13 @@ if __name__ == '__main__':
     #Encode the movie
     os.chdir(tmp_path)
     command = ['mencoder', 'mf://*', '-mf', 'fps='+str(fps), '-o', 'output.avi',
-        '-ovc', 'lavc', '-lavcopts', 'vcodec=msmpeg4v2:vbitrate=800']
+               '-ovc', 'lavc', '-lavcopts', 'vcodec=msmpeg4v2:vbitrate=800']
+    command = ['ffmpeg', '-f', 'image2', '-i', '%05d.png', 'output.mpg']
+    logging.debug('command: ' + str(command))
     process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     stdout, stderr = process.communicate()
+    logging.debug(stdout.decode('utf8'))
+    logging.warning(stderr.decode('utf8'))
 
     #Copy the movie
-    shutil.copy('output.avi', os.path.join(cwd, output + '.avi'))
-
-
+    shutil.copy('output.mpg', os.path.join(cwd, output + '.mpg'))
