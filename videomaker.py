@@ -207,7 +207,7 @@ if __name__ == '__main__':
     os.chdir(tmp_path)
     command = ['mencoder', 'mf://*', '-mf', 'fps='+str(fps), '-o', 'output.avi',
                '-ovc', 'lavc', '-lavcopts', 'vcodec=msmpeg4v2:vbitrate=800']
-    command = ['ffmpeg', '-f', 'image2', '-i', '%05d.png', 'output.mpg']
+    command = ['ffmpeg', '-f', 'image2', '-r', str(fps), '-i', '%05d.png', 'output.mpg']
     logging.debug('command: ' + str(command))
     process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     stdout, stderr = process.communicate()
