@@ -97,11 +97,15 @@ def alphanum_key(s):
 class VideoSection():
     """
     Gather data about a video section
+
+
+    :repeat: repeat the movie N times
     """
-    def __init__(self, path, num_frame_slide, every=1):
+    def __init__(self, path, num_frame_slide, every=1, repeat=1):
         self.path = path
         self.num_frame_slide = num_frame_slide
         self.every = every
+        self.repeat = repeat
 
 
 def prepare_pictures(tmp_path, opening, bodies, ending):
@@ -137,18 +141,13 @@ def prepare_pictures(tmp_path, opening, bodies, ending):
         pictures = sorted(os.listdir(body.path), key=alphanum_key)
         pictures = [os.path.join(body.path, item) for item in pictures]
 
-        for item in pictures[::body.every]:
-            shutil.copy(item, gen.__next__())
+        for rep in range(repeat):
+            for item in pictures[::body.every]:
+                shutil.copy(item, gen.__next__())
 
     #Part 3, ending
     if ending.path:
-<<<<<<< HEAD:src/videomaker.py
-        endfile = make_slide(ending.path)
-
-=======
         endfile = make_slide(ending.path, resolution)
-
->>>>>>> db29ee3863b8d84bb1bbbe5fae8b6ea742583f29:videomaker.py
         if endfile:
             for count in range(ending.num_frame_slide):
                 shutil.copy(endfile, gen.__next__())
@@ -177,7 +176,8 @@ if __name__ == '__main__':
     #Body
     pic_paths = config['body'].get('path').split(',')
     every = config['body'].getint('every', '1')
-    body_sections = [VideoSection(path, config['body'].getint('duration', 0), every) for path in pic_paths]
+    repeat = config['body'].getint('repeat', '1')
+    body_sections = [VideoSection(path, config['body'].getint('duration', 0), every, repeat) for path in pic_paths]
 
     #Ending
     end_duration = config['ending'].getint('duration', 0)  #seconds
