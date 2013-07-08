@@ -119,11 +119,13 @@ def prepare_pictures(tmp_path, opening, bodies, ending):
     :param bodies:
     :param ending:
     """
+    logger.info('Prepare pictures...')
     resolution = (1200, 800)
     gen = name_it(tmp_path)
 
     #Part 1, opening
     if opening.path:
+        logger.info('[Opening]')
         introfile = make_slide(opening.path, resolution)
 
         if introfile:
@@ -132,6 +134,7 @@ def prepare_pictures(tmp_path, opening, bodies, ending):
 
     #Part 2, body
     for body in bodies:
+        logger.info('[Body]')
         slide = make_slide(body.path, resolution)
         if slide:
             for count in range(body.num_frame_slide):
@@ -143,12 +146,14 @@ def prepare_pictures(tmp_path, opening, bodies, ending):
         pictures = sorted(os.listdir(body.path), key=alphanum_key)
         pictures = [os.path.join(body.path, item) for item in pictures]
 
+        logger.debug(pictures)
         for rep in range(repeat):
             for item in pictures[::body.every]:
                 shutil.copy(item, gen.__next__())
 
     #Part 3, ending
     if ending.path:
+        logger.info('[Ending]')
         endfile = make_slide(ending.path, resolution)
         if endfile:
             for count in range(ending.num_frame_slide):
@@ -200,14 +205,17 @@ if __name__ == '__main__':
 
     #Prepare pictures in tmp dir
     tmp_path = tempfile.mkdtemp()
+    logger.debug('tmp_path %s', tmp_path)
 
     prepare_pictures(tmp_path, opening_section, body_sections, end_section)
 
     #Encode the movie
+    logger.info('Generate the movie...')
     os.chdir(tmp_path)
     command = ['mencoder', 'mf://*', '-mf', 'fps='+str(fps), '-o', 'output.avi',
                '-ovc', 'lavc', '-lavcopts', 'vcodec=msmpeg4v2:vbitrate=800']
     command = ['ffmpeg', '-f', 'image2', '-r', str(fps), '-i', '%05d.png', 'output.mpg']
+    command = ['ffmpeg', '-f', 'image2', '-i', '%05d.png', 'output.mpg']
     logging.debug('command: ' + str(command))
     process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     stdout, stderr = process.communicate()
