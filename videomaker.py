@@ -195,8 +195,8 @@ if __name__ == '__main__':
 
     #Body
     pic_paths = config['body'].get('path').split(',')
-    every = config['body'].getint('every', '1')
-    repeat = config['body'].getint('repeat', '1')
+    every = config['body'].getint('every', 1)
+    repeat = config['body'].getint('repeat', 1)
     body_sections = [VideoSection(path, config['body'].getint('duration', 0), every, repeat) for path in pic_paths]
 
     #Ending
