@@ -133,8 +133,8 @@ def prepare_pictures(tmp_path, opening, bodies, ending):
                 shutil.copy(introfile, gen.__next__())
 
     #Part 2, body
+    logger.info('[Body]')
     for body in bodies:
-        logger.info('[Body]')
         slide = make_slide(body.path, resolution)
         if slide:
             for count in range(body.num_frame_slide):
