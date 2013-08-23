@@ -110,7 +110,7 @@ class VideoSection():
         self.repeat = repeat
 
 
-def prepare_pictures(tmp_path, opening, bodies, ending):
+def prepare_pictures(tmp_path, opening, bodies, ending, tmp_loc=None):
     """
     Put pictures in tmp_path with a correct name (sorted)
 
@@ -118,6 +118,7 @@ def prepare_pictures(tmp_path, opening, bodies, ending):
     :param opening:
     :param bodies:
     :param ending:
+    :param tmp_loc: path where tmp dirs are created
     """
     logger.info('Prepare pictures...')
     #TODO: setup this somewhere
@@ -128,7 +129,7 @@ def prepare_pictures(tmp_path, opening, bodies, ending):
     #Part 1, opening
     if opening.path:
         logger.info('[Opening]')
-        tmp_path = tempfile.mkdtemp()
+        tmp_path = tempfile.mkdtemp(dir=tmp_loc)
         introfile = make_slide(opening.path, tmp_path, resolution)
         if introfile:
             for count in range(opening.num_frame_slide):
@@ -138,7 +139,7 @@ def prepare_pictures(tmp_path, opening, bodies, ending):
     #Part 2, body
     logger.info('[Body]')
     for body in bodies:
-        tmp_path = tempfile.mkdtemp()
+        tmp_path = tempfile.mkdtemp(dir=tmp_loc)
         slide = make_slide(body.path, tmp_path, resolution)
         if slide:
             for count in range(body.num_frame_slide):
@@ -169,7 +170,7 @@ def prepare_pictures(tmp_path, opening, bodies, ending):
     #Part 3, ending
     if ending.path:
         logger.info('[Ending]')
-        tmp_path = tempfile.mkdtemp()
+        tmp_path = tempfile.mkdtemp(dir=tmp_loc)
         endfile = make_slide(ending.path, tmp_path, resolution)
         if endfile:
             for count in range(ending.num_frame_slide):
@@ -181,6 +182,8 @@ if __name__ == '__main__':
 
     parser = argparse.ArgumentParser(description='', epilog='')
     parser.add_argument('conf', help='Configuration file', metavar='CONF')
+    parser.add_argument('-t', '--tmp', metavar='TMP',
+                        default=None, help='Directery where are stored tmp files')
     parser.add_argument('-d', '--debug', action='store_true',
                         default=False, help='Run in debug mode')
 
@@ -223,10 +226,10 @@ if __name__ == '__main__':
     end_section = VideoSection(config['ending'].get('path', None), 25 * end_duration)
 
     #Prepare pictures in tmp dir
-    tmp_path = tempfile.mkdtemp()
+    tmp_path = tempfile.mkdtemp(dir=args.tmp)
     logger.debug('tmp_path for pictures %s', tmp_path)
 
-    prepare_pictures(tmp_path, opening_section, body_sections, end_section)
+    prepare_pictures(tmp_path, opening_section, body_sections, end_section, tmp_loc=args.tmp)
 
     #Encode the movie
     logger.info('Generate the movie...')
