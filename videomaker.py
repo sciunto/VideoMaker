@@ -24,6 +24,7 @@ import shutil
 import argparse
 import configparser
 import logging
+import math
 
 
 def make_slide(intro_dir, resolution=(1200, 800)):
@@ -105,10 +106,10 @@ class VideoSection():
 
     :repeat: repeat the movie N times
     """
-    def __init__(self, path, num_frame_slide, every=1, repeat=1):
+    def __init__(self, path, num_frame_slide, number=1, repeat=1):
         self.path = path
         self.num_frame_slide = num_frame_slide
-        self.every = every
+        self.number = number
         self.repeat = repeat
 
 
@@ -122,7 +123,7 @@ def prepare_pictures(tmp_path, opening, bodies, ending):
     :param ending:
     """
     logger.info('Prepare pictures...')
-    resolution = (1200, 800)
+    #TODO: setup this somewhere
     resolution = (800, 600)
     gen = name_it(tmp_path)
 
@@ -150,9 +151,19 @@ def prepare_pictures(tmp_path, opening, bodies, ending):
         pictures = [os.path.join(body.path, item) for item in pictures]
 
         logger.debug('List of pictures: %s' % pictures)
-        for rep in range(repeat):
-            for item in pictures[::body.every]:
-                shutil.copy(item, gen.__next__())
+        if body.number >= 1:
+            #duplicate
+            times = math.floor(body.number)
+            for rep in range(repeat):
+                for item in pictures:
+                    for time in range(times):
+                        shutil.copy(item, gen.__next__())
+        elif body.number < 1:
+            # pick one every...
+            every = math.floor(1/body.number)
+            for rep in range(repeat):
+                for item in pictures[::every]:
+                    shutil.copy(item, gen.__next__())
 
     #Part 3, ending
     if ending.path:
@@ -198,9 +209,12 @@ if __name__ == '__main__':
 
     #Body
     pic_paths = config['body'].get('path').split(',')
-    every = config['body'].getint('every', 1)
+    inifps = config['body'].getint('inifps', 1)
+    speed = config['body'].getint('speed', 1)
     repeat = config['body'].getint('repeat', 1)
-    body_sections = [VideoSection(path, config['body'].getint('duration', 0), every, repeat) for path in pic_paths]
+
+    number = 25 / inifps / speed
+    body_sections = [VideoSection(path, config['body'].getint('duration', 0), number, repeat) for path in pic_paths]
 
     #Ending
     end_duration = config['ending'].getint('duration', 0)  # seconds
@@ -219,7 +233,8 @@ if __name__ == '__main__':
                '-vf', 'scale=800:600',
                '-o', 'output.avi',
                '-ovc', 'xvid',
-               '-xvidencopts', 'bitrate=500']
+               '-xvidencopts', 'bitrate=500'
+               ]
     logging.debug('command: ' + str(command))
     process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     stdout, stderr = process.communicate()
