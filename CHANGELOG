@@ -1,4 +1,11 @@
 ============
+Version 0.
+============
+* Change framerate handling for body
+* New command for building the movie
+* user can specify the tmp directory
+
+============
 Version 0.1 2012-11-13
 ============
 * First version
