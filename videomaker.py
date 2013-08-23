@@ -146,7 +146,7 @@ def prepare_pictures(tmp_path, opening, bodies, ending):
         pictures = sorted(os.listdir(body.path), key=alphanum_key)
         pictures = [os.path.join(body.path, item) for item in pictures]
 
-        logger.debug(pictures)
+        logger.debug('List of pictures: %s' % pictures)
         for rep in range(repeat):
             for item in pictures[::body.every]:
                 shutil.copy(item, gen.__next__())
@@ -214,8 +214,8 @@ if __name__ == '__main__':
     os.chdir(tmp_path)
     command = ['mencoder', 'mf://*', '-mf', 'fps='+str(fps), '-o', 'output.avi',
                '-ovc', 'lavc', '-lavcopts', 'vcodec=msmpeg4v2:vbitrate=800']
-    command = ['ffmpeg', '-f', 'image2', '-r', str(fps), '-i', '%05d.png', 'output.mpg']
-    command = ['ffmpeg', '-f', 'image2', '-i', '%05d.png', 'output.mpg']
+    #command = ['ffmpeg', '-f', 'image2', '-r', str(fps), '-i', '%05d.png', 'output.mpg']
+    #command = ['ffmpeg', '-f', 'image2', '-i', '%05d.png', 'output.mpg']
     logging.debug('command: ' + str(command))
     process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     stdout, stderr = process.communicate()
@@ -223,6 +223,8 @@ if __name__ == '__main__':
     logging.warning(stderr.decode('utf8'))
 
     #Copy the movie
-    shutil.copy('output.mpg', os.path.join(cwd, output + '.mpg'))
+    #shutil.copy('output.mpg', os.path.join(cwd, output + '.mpg'))
+    logging.debug('Move to %s' % cwd)
+    shutil.copy('output.avi', os.path.join(cwd, output + '.avi'))
     #Delete the tmp dir
     shutil.rmtree(tmp_path)
