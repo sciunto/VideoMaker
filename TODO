@@ -1,6 +1,8 @@
 * Modify content for ending, body...
 * Fix the size of pictures before the video build
 
+* remove tmp dir after keybordinterupt
+
 
 DONE:
 * Add frames between set of pictures?
