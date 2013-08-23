@@ -36,7 +36,9 @@ def make_slide(intro_dir, resolution=(1200, 800)):
     """
     resol = str(resolution[0]) + 'x' + str(resolution[1])
 
+    #TODO: we should delete this
     tmp_path = tempfile.mkdtemp()
+    logger.debug('tmp_path for slide %s', tmp_path)
 
     tex_glob = glob.glob(os.path.abspath(intro_dir) + '/*tex')
     if tex_glob == []:
@@ -121,6 +123,7 @@ def prepare_pictures(tmp_path, opening, bodies, ending):
     """
     logger.info('Prepare pictures...')
     resolution = (1200, 800)
+    resolution = (800, 600)
     gen = name_it(tmp_path)
 
     #Part 1, opening
@@ -205,17 +208,18 @@ if __name__ == '__main__':
 
     #Prepare pictures in tmp dir
     tmp_path = tempfile.mkdtemp()
-    logger.debug('tmp_path %s', tmp_path)
+    logger.debug('tmp_path for pictures %s', tmp_path)
 
     prepare_pictures(tmp_path, opening_section, body_sections, end_section)
 
     #Encode the movie
     logger.info('Generate the movie...')
     os.chdir(tmp_path)
-    command = ['mencoder', 'mf://*', '-mf', 'fps='+str(fps), '-o', 'output.avi',
-               '-ovc', 'lavc', '-lavcopts', 'vcodec=msmpeg4v2:vbitrate=800']
-    #command = ['ffmpeg', '-f', 'image2', '-r', str(fps), '-i', '%05d.png', 'output.mpg']
-    #command = ['ffmpeg', '-f', 'image2', '-i', '%05d.png', 'output.mpg']
+    command = ['mencoder', 'mf://*.png', '-mf', 'fps=25',
+               '-vf', 'scale=800:600',
+               '-o', 'output.avi',
+               '-ovc', 'xvid',
+               '-xvidencopts', 'bitrate=500']
     logging.debug('command: ' + str(command))
     process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     stdout, stderr = process.communicate()
@@ -223,8 +227,8 @@ if __name__ == '__main__':
     logging.warning(stderr.decode('utf8'))
 
     #Copy the movie
-    #shutil.copy('output.mpg', os.path.join(cwd, output + '.mpg'))
     logging.debug('Move to %s' % cwd)
     shutil.copy('output.avi', os.path.join(cwd, output + '.avi'))
     #Delete the tmp dir
+    logging.debug('Delete the tmp_dir %s' % tmp_path)
     shutil.rmtree(tmp_path)
