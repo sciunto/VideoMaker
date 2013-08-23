@@ -200,12 +200,11 @@ if __name__ == '__main__':
     cwd = os.getcwd()
 
     #Movie section
-    fps = config['movie'].getint('fps')
     output = config['movie'].get('output', 'output')
 
     #Opening
     open_duration = config['opening'].getint('duration', 0)  # seconds
-    opening_section = VideoSection(config['opening'].get('path', None), fps * open_duration)
+    opening_section = VideoSection(config['opening'].get('path', None), 25 * open_duration)
 
     #Body
     pic_paths = config['body'].get('path').split(',')
@@ -218,7 +217,7 @@ if __name__ == '__main__':
 
     #Ending
     end_duration = config['ending'].getint('duration', 0)  # seconds
-    end_section = VideoSection(config['ending'].get('path', None), fps * end_duration)
+    end_section = VideoSection(config['ending'].get('path', None), 25 * end_duration)
 
     #Prepare pictures in tmp dir
     tmp_path = tempfile.mkdtemp()
