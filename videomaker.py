@@ -27,7 +27,7 @@ import logging
 import math
 
 
-def make_slide(intro_dir, resolution=(1200, 800)):
+def make_slide(intro_dir, tmp_path, resolution=(1200, 800)):
     """
     Make introduction png files
 
@@ -37,9 +37,6 @@ def make_slide(intro_dir, resolution=(1200, 800)):
     """
     resol = str(resolution[0]) + 'x' + str(resolution[1])
 
-    #TODO: we should delete this
-    tmp_path = tempfile.mkdtemp()
-    logger.debug('tmp_path for slide %s', tmp_path)
 
     tex_glob = glob.glob(os.path.abspath(intro_dir) + '/*tex')
     if tex_glob == []:
@@ -127,22 +124,26 @@ def prepare_pictures(tmp_path, opening, bodies, ending):
     resolution = (800, 600)
     gen = name_it(tmp_path)
 
+
     #Part 1, opening
     if opening.path:
         logger.info('[Opening]')
-        introfile = make_slide(opening.path, resolution)
-
+        tmp_path = tempfile.mkdtemp()
+        introfile = make_slide(opening.path, tmp_path, resolution)
         if introfile:
             for count in range(opening.num_frame_slide):
                 shutil.copy(introfile, gen.__next__())
+        shutil.rmtree(tmp_path)
 
     #Part 2, body
     logger.info('[Body]')
     for body in bodies:
-        slide = make_slide(body.path, resolution)
+        tmp_path = tempfile.mkdtemp()
+        slide = make_slide(body.path, tmp_path, resolution)
         if slide:
             for count in range(body.num_frame_slide):
                 shutil.copy(slide, gen.__next__())
+        shutil.rmtree(tmp_path)
 
         #TODO: for each picture:
         # * resize in order that the resolution is in the resolution defined above
@@ -168,10 +169,12 @@ def prepare_pictures(tmp_path, opening, bodies, ending):
     #Part 3, ending
     if ending.path:
         logger.info('[Ending]')
-        endfile = make_slide(ending.path, resolution)
+        tmp_path = tempfile.mkdtemp()
+        endfile = make_slide(ending.path, tmp_path, resolution)
         if endfile:
             for count in range(ending.num_frame_slide):
                 shutil.copy(endfile, gen.__next__())
+        shutil.rmtree(tmp_path)
 
 
 if __name__ == '__main__':
