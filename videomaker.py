@@ -97,16 +97,17 @@ def make_slide(intro_dir, tmp_path, resolution=(1200, 800)):
     return pngfile
 
 
-def name_it(tmp_path):
+def name_it(tmp_path, digits=6):
     """
     Iterator returning a picture name located in tmp_path
 
     :param tmp_path:
+    :param digits: number of digits used in the name
     :returns: iterator
     """
     i = 0
     while True:
-        pngfile = os.path.join(tmp_path, str(i).zfill(5) + '.png')
+        pngfile = os.path.join(tmp_path, str(i).zfill(digits) + '.png')
         yield(pngfile)
         i += 1
 
@@ -266,7 +267,7 @@ if __name__ == '__main__':
     speed = config['body'].getint('speed', 1)
     repeat = config['body'].getint('repeat', 1)
 
-    number = 25 / inifps / speed
+    number = FPS / inifps / speed
     body_sections = [VideoSection(path, config['body'].getint('duration', 0), number, repeat) for path in pic_paths]
 
     #Ending
