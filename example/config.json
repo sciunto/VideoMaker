@@ -1,47 +1,47 @@
 {
     "meta" :
     {
-        "jsonversion" : "0.1",
-    }
+        "jsonversion" : "0.1"
+    },
     "movie" :
     {
-        "output" : "myvideo",
-    }
+        "output" : "myvideo"
+    },
     "data" :
     {
         "open" :
         {
             "type" : "tex",
             "duration" : 3,
-            "path" : "opening",
-        }
+            "path" : "opening"
+        },
         "body1" :
         {
            "type" : "image",
            "path" : "pictures1",
            "inifps" : 1,
            "speed" : 1,
-           "repeat" : 1,
-        }
+           "repeat" : 1
+        },
         "transition1" :
         {
             "type" : "tex",
             "duration" : 3,
-            "path" : "transition",
-        }
+            "path" : "transition"
+        },
         "body2" :
         {
            "type" : "image",
            "path" : "pictures2",
            "inifps" : 1,
            "speed" : 1,
-           "repeat" : 1,
-        }
+           "repeat" : 1
+        },
         "close" :
         {
             "type" : "tex",
             "duration" : 3,
-            "path" : "ending",
+            "path" : "ending"
         }
     }
 }
