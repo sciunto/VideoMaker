@@ -29,7 +29,9 @@ How to install
 You must install before:
 
 * python3
+* pillow
 * latex, dvipng, beamer class...
+* mencoder
 
 How to run
 ==========
