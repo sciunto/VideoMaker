@@ -61,42 +61,6 @@ def add_bg(im, bg, angle=0):
     return wbg
 
 
-def make_slide(intro_dir, tmp_path, resolution=(1200, 800)):
-    """
-    Make introduction png files
-
-    :param intro_dir: path to the dir containing a tex file
-    :param resolution: picture resolution of the slides
-    :returns: png file path
-    """
-    logger.debug('Build a tex file')
-    resol = str(resolution[0]) + 'x' + str(resolution[1])
-
-    tex_glob = glob.glob(os.path.abspath(intro_dir) + '/*tex')
-    if tex_glob == []:
-        return None
-    if len(tex_glob) > 1:
-        print('Error, non uniq tex file in %s' % intro_dir)
-        return None
-
-    filename = os.path.splitext(os.path.basename(tex_glob[0]))[0]
-    texfile = os.path.join(intro_dir, filename + '.tex')
-    #dvifile = os.path.join(tmp_path, filename + '.dvi')
-    pdffile = os.path.join(tmp_path, filename + '.pdf')
-    pngfile = os.path.join(tmp_path, filename + '.png')
-
-    #command = ['/usr/bin/latex', '-output-directory=' + str(tmp_path), str(texfile)]
-    command = ['/usr/bin/pdflatex', '-output-directory=' + str(tmp_path), str(texfile)]
-    process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    stdout, stderr = process.communicate()
-
-    command = ['/usr/bin/convert', '-density', '600', str(pdffile), '-resize', resol,  str(pngfile)]
-    #command = ['/usr/bin/dvipng', '-o', str(pngfile), str(dvifile)]
-    process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    stdout, stderr = process.communicate()
-    return pngfile
-
-
 def name_it(tmp_path, digits=6):
     """
     Iterator returning a picture name located in tmp_path
@@ -143,6 +107,42 @@ class VideoSection():
         self.num_frame_slide = num_frame_slide
         self.number = number
         self.repeat = repeat
+
+
+def make_slide(intro_dir, tmp_path, resolution=(1200, 800)):
+    """
+    Make introduction png files
+
+    :param intro_dir: path to the dir containing a tex file
+    :param resolution: picture resolution of the slides
+    :returns: png file path
+    """
+    logger.debug('Build a tex file')
+    resol = str(resolution[0]) + 'x' + str(resolution[1])
+
+    tex_glob = glob.glob(os.path.abspath(intro_dir) + '/*tex')
+    if tex_glob == []:
+        return None
+    if len(tex_glob) > 1:
+        print('Error, non uniq tex file in %s' % intro_dir)
+        return None
+
+    filename = os.path.splitext(os.path.basename(tex_glob[0]))[0]
+    texfile = os.path.join(intro_dir, filename + '.tex')
+    #dvifile = os.path.join(tmp_path, filename + '.dvi')
+    pdffile = os.path.join(tmp_path, filename + '.pdf')
+    pngfile = os.path.join(tmp_path, filename + '.png')
+
+    #command = ['/usr/bin/latex', '-output-directory=' + str(tmp_path), str(texfile)]
+    command = ['/usr/bin/pdflatex', '-output-directory=' + str(tmp_path), str(texfile)]
+    process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    stdout, stderr = process.communicate()
+
+    command = ['/usr/bin/convert', '-density', '600', str(pdffile), '-resize', resol,  str(pngfile)]
+    #command = ['/usr/bin/dvipng', '-o', str(pngfile), str(dvifile)]
+    process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    stdout, stderr = process.communicate()
+    return pngfile
 
 
 def prepare_pictures(output_dir, opening, bodies, ending, resolution=(800, 600), tmp_loc=None):
