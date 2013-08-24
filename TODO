@@ -1,5 +1,4 @@
 * Modify content for ending, body...
-* Fix the size of pictures before the video build
 
 * remove tmp dir after keybordinterupt
 * write a log in the output dir
