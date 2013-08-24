@@ -72,7 +72,6 @@ def make_slide(intro_dir, tmp_path, resolution=(1200, 800)):
     logger.debug('Build a tex file')
     resol = str(resolution[0]) + 'x' + str(resolution[1])
 
-
     tex_glob = glob.glob(os.path.abspath(intro_dir) + '/*tex')
     if tex_glob == []:
         return None
@@ -82,7 +81,7 @@ def make_slide(intro_dir, tmp_path, resolution=(1200, 800)):
 
     filename = os.path.splitext(os.path.basename(tex_glob[0]))[0]
     texfile = os.path.join(intro_dir, filename + '.tex')
-    dvifile = os.path.join(tmp_path, filename + '.dvi')
+    #dvifile = os.path.join(tmp_path, filename + '.dvi')
     pdffile = os.path.join(tmp_path, filename + '.pdf')
     pngfile = os.path.join(tmp_path, filename + '.png')
 
@@ -145,7 +144,7 @@ class VideoSection():
         self.repeat = repeat
 
 
-def prepare_pictures(output_dir, opening, bodies, ending, tmp_loc=None):
+def prepare_pictures(output_dir, opening, bodies, ending, resolution=(800, 600), tmp_loc=None):
     """
     Put pictures in tmp_path with a correct name (sorted)
 
@@ -153,11 +152,10 @@ def prepare_pictures(output_dir, opening, bodies, ending, tmp_loc=None):
     :param opening: :class:`VideoSection` instance for opening
     :param bodies: :class:`VideoSection` instance for bodies
     :param ending: :class:`VideoSection` instance for ending
+    :param resolution: Tuple speciafying the resolution
     :param tmp_loc: path where tmp dirs are created
     """
     logger.info('Prepare pictures...')
-    #TODO: setup this somewhere
-    resolution = (800, 600)
     # Start a generator
     gen = name_it(output_dir)
     # Background: auto-generated for the moment
@@ -253,6 +251,7 @@ if __name__ == '__main__':
     cwd = os.getcwd()
 
     FPS = 25
+    resolution = (800, 600)
 
     #Movie section
     output = config['movie'].get('output', 'output')
@@ -278,7 +277,8 @@ if __name__ == '__main__':
     tmp_path = tempfile.mkdtemp(dir=args.tmp)
     logger.debug('tmp_path for pictures %s', tmp_path)
 
-    prepare_pictures(tmp_path, opening_section, body_sections, end_section, tmp_loc=args.tmp)
+    prepare_pictures(tmp_path, opening_section, body_sections, end_section,
+                     resolution=resolution, tmp_loc=args.tmp)
 
     #Encode the movie
     logger.info('Generate the movie...')
