@@ -295,8 +295,7 @@ class Video():
                     full_im = add_bg(full_im, bg, angle=angle)
                     full_im.save(tmp_file)
                     shutil.copy(tmp_file, self.generator.__next__())
-        #FIXME rm file
-        #shutil.rmtree(tmp_file)
+        os.remove(tmp_file)
 
     def make(self, cwd, output, fps=25):
         """
@@ -323,6 +322,7 @@ class Video():
         #Copy the movie
         logging.debug('Move to %s' % cwd)
         shutil.copy('output.avi', os.path.join(cwd, output + '.avi'))
+        #TODO: put this somewhere
         #Delete the tmp dir
         #logging.debug('Delete the tmp_dir %s' % tmp_path)
         #shutil.rmtree(tmp_path)
