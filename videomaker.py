@@ -158,6 +158,7 @@ def prepare_pictures(output_dir, opening, bodies, ending, tmp_loc=None):
     logger.info('Prepare pictures...')
     #TODO: setup this somewhere
     resolution = (800, 600)
+    # Start a generator
     gen = name_it(output_dir)
     # Background: auto-generated for the moment
     bg = Image.new("RGB", resolution, color=(0, 0, 0)) # Black.
@@ -167,7 +168,7 @@ def prepare_pictures(output_dir, opening, bodies, ending, tmp_loc=None):
     #Part 1, opening
     if opening.path:
         logger.info('[Opening]')
-        tmp_path = tempfile.mkdtemp(dir=tmp_loc)
+        tmp_path = tempfile.mkdtemp(dir=tmp_loc, prefix='tmp_open')
         introfile = make_slide(opening.path, tmp_path, resolution)
         if introfile:
             for count in range(opening.num_frame_slide):
@@ -177,7 +178,7 @@ def prepare_pictures(output_dir, opening, bodies, ending, tmp_loc=None):
     #Part 2, body
     logger.info('[Body]')
     for body in bodies:
-        tmp_path = tempfile.mkdtemp(dir=tmp_loc)
+        tmp_path = tempfile.mkdtemp(dir=tmp_loc, prefix='tmp_body')
         slide = make_slide(body.path, tmp_path, resolution)
         if slide:
             for count in range(body.num_frame_slide):
@@ -187,6 +188,7 @@ def prepare_pictures(output_dir, opening, bodies, ending, tmp_loc=None):
         pictures = sorted(os.listdir(body.path), key=alphanum_key)
         pictures = [os.path.join(body.path, item) for item in pictures]
 
+        tmp_file = tempfile.mkstemp(dir=tmp_loc, prefix='pic')
         if body.number >= 1:
             # duplicate the picture...
             times = math.floor(body.number)
@@ -196,9 +198,9 @@ def prepare_pictures(output_dir, opening, bodies, ending, tmp_loc=None):
                     # stick the item on a background
                     full_im = Image.open(item)
                     full_im = add_bg(full_im, bg, angle=angle)
-                    full_im.save('/tmp/toto.png') #FIXME change this
+                    full_im.save(tmp_file)
                     for time in range(times):
-                        shutil.copy('/tmp/toto.png', gen.__next__())
+                        shutil.copy(tmp_file, gen.__next__())
         elif body.number < 1:
             # pick one every...
             every = math.floor(1/body.number)
@@ -208,13 +210,14 @@ def prepare_pictures(output_dir, opening, bodies, ending, tmp_loc=None):
                     # stick the item on a background
                     full_im = Image.open(item)
                     full_im = add_bg(full_im, bg, angle=angle)
-                    full_im.save('/tmp/toto.png') #FIXME change this
-                    shutil.copy('/tmp/toto.png', gen.__next__())
+                    full_im.save(tmp_file)
+                    shutil.copy(tmp_file, gen.__next__())
+        shutil.rmtree(tmp_path)
 
     #Part 3, ending
     if ending.path:
         logger.info('[Ending]')
-        tmp_path = tempfile.mkdtemp(dir=tmp_loc)
+        tmp_path = tempfile.mkdtemp(dir=tmp_loc, prefix='tmp_end')
         endfile = make_slide(ending.path, tmp_path, resolution)
         if endfile:
             for count in range(ending.num_frame_slide):
@@ -249,12 +252,14 @@ if __name__ == '__main__':
 
     cwd = os.getcwd()
 
+    FPS = 25
+
     #Movie section
     output = config['movie'].get('output', 'output')
 
     #Opening
     open_duration = config['opening'].getint('duration', 0)  # seconds
-    opening_section = VideoSection(config['opening'].get('path', None), 25 * open_duration)
+    opening_section = VideoSection(config['opening'].get('path', None), FPS * open_duration)
 
     #Body
     pic_paths = config['body'].get('path').split(',')
@@ -267,7 +272,7 @@ if __name__ == '__main__':
 
     #Ending
     end_duration = config['ending'].getint('duration', 0)  # seconds
-    end_section = VideoSection(config['ending'].get('path', None), 25 * end_duration)
+    end_section = VideoSection(config['ending'].get('path', None), FPS * end_duration)
 
     #Prepare pictures in tmp dir
     tmp_path = tempfile.mkdtemp(dir=args.tmp)
@@ -278,7 +283,7 @@ if __name__ == '__main__':
     #Encode the movie
     logger.info('Generate the movie...')
     os.chdir(tmp_path)
-    command = ['mencoder', 'mf://*.png', '-mf', 'fps=25',
+    command = ['mencoder', 'mf://*.png', '-mf', 'fps='+str(FPS),
                '-vf', 'scale=800:600',
                '-o', 'output.avi',
                '-ovc', 'xvid',
