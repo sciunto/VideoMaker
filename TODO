@@ -2,7 +2,6 @@
 
 * remove tmp dir after keybordinterupt
 * write a log in the output dir
-* Fix issue: if the config file is not in cwd, pictures path is not correct
 
 * Should put the tex file elsewhere
 

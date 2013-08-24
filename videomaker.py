@@ -436,6 +436,9 @@ if __name__ == '__main__':
 
     import json
     from collections import OrderedDict
+
+    root_dir = os.path.split(os.path.abspath(args.conf))[0]
+    logger.debug('root_dir: %s' % root_dir)
     with open(args.conf, 'r') as jsonfile:
         conf = json.load(jsonfile, object_pairs_hook=OrderedDict)
         for section, value in conf.items():
@@ -448,12 +451,12 @@ if __name__ == '__main__':
                 for subsection, subvalue in value.items():
                     if subvalue['type'] == 'tex':
                         duration = subvalue['duration']
-                        path = subvalue['path']
+                        path = os.path.join(root_dir, subvalue['path'])
                         number = FPS * duration
                         number = 1 #FIXME
                         vid.populate_with_slides(path, number)
                     elif subvalue['type'] == 'image':
-                        path = subvalue['path']
+                        path = os.path.join(root_dir, subvalue['path'])
                         inifps = subvalue['inifps']
                         speed = subvalue['speed']
                         repeat = subvalue['repeat']
