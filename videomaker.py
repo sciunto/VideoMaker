@@ -25,16 +25,51 @@ import argparse
 import configparser
 import logging
 import math
+from PIL import Image
+
+
+def add_bg(im, bg, angle=0):
+    """
+    Put image `im` on a background `bg`.
+    Pre-rotate the image with an `angle`.
+
+    """
+    # Rotate the image
+    if angle != 0:
+        im = im.rotate(angle)
+
+    if im.size == bg.size:
+        # Nothing to hide!
+        return im.copy()
+
+    # Copy to do not overwrite bg
+    wbg = bg.copy()
+
+    if im.size[1] > im.size[0]:
+        # Match size along the vert. dir.
+        ratio = wbg.size[1]/im.size[1]
+        newsize = (math.floor(im.size[0]*ratio), wbg.size[1])
+        box = (math.floor(math.fabs(wbg.size[0]-im.size[0])/2), 0)
+    else:
+        ratio = wbg.size[0]/im.size[0]
+        newsize = (wbg.size[0], math.floor(im.size[1]*ratio))
+        box = (0, math.floor(math.fabs(wbg.size[1]-im.size[1])/2))
+
+    im = im.resize(newsize)
+
+    wbg.paste(im, box=box)
+    return wbg
 
 
 def make_slide(intro_dir, tmp_path, resolution=(1200, 800)):
     """
     Make introduction png files
 
-    :param intro_dir:
+    :param intro_dir: path to the dir containing a tex file
     :param resolution: picture resolution of the slides
     :returns: png file path
     """
+    logger.debug('Build a tex file')
     resol = str(resolution[0]) + 'x' + str(resolution[1])
 
 
@@ -93,7 +128,7 @@ def alphanum_key(s):
     """
     return [tryint(c) for c in re.split('([0-9]+)', s)]
 
-##############Natural sorting
+##############Natural sorting : end
 
 
 class VideoSection():
@@ -114,17 +149,20 @@ def prepare_pictures(tmp_path, opening, bodies, ending, tmp_loc=None):
     """
     Put pictures in tmp_path with a correct name (sorted)
 
-    :param tmp_path:
-    :param opening:
-    :param bodies:
-    :param ending:
+    :param tmp_path: temporary path where final images are written
+    :param opening: :class:`VideoSection` instance for opening
+    :param bodies: :class:`VideoSection` instance for bodies
+    :param ending: :class:`VideoSection` instance for ending
     :param tmp_loc: path where tmp dirs are created
     """
     logger.info('Prepare pictures...')
     #TODO: setup this somewhere
     resolution = (800, 600)
     gen = name_it(tmp_path)
-
+    # Background: auto-generated for the moment
+    bg = Image.new("RGB", resolution, color=(0, 0, 0)) # Black.
+    # Angle to rotate each image (for futher improvements)
+    angle = 0
 
     #Part 1, opening
     if opening.path:
@@ -146,26 +184,32 @@ def prepare_pictures(tmp_path, opening, bodies, ending, tmp_loc=None):
                 shutil.copy(slide, gen.__next__())
         shutil.rmtree(tmp_path)
 
-        #TODO: for each picture:
-        # * resize in order that the resolution is in the resolution defined above
-        # * Extend the picture (background color) to have exactly the same resolution
         pictures = sorted(os.listdir(body.path), key=alphanum_key)
         pictures = [os.path.join(body.path, item) for item in pictures]
 
-        logger.debug('List of pictures: %s' % pictures)
         if body.number >= 1:
-            #duplicate
+            # duplicate the picture...
             times = math.floor(body.number)
             for rep in range(repeat):
                 for item in pictures:
+                    logger.debug('Process: %s' % item)
+                    # stick the item on a background
+                    full_im = Image.open(item)
+                    full_im = add_bg(full_im, bg, angle=angle)
+                    full_im.save('/tmp/toto.png') #FIXME change this
                     for time in range(times):
-                        shutil.copy(item, gen.__next__())
+                        shutil.copy('/tmp/toto.png', gen.__next__())
         elif body.number < 1:
             # pick one every...
             every = math.floor(1/body.number)
             for rep in range(repeat):
                 for item in pictures[::every]:
-                    shutil.copy(item, gen.__next__())
+                    logger.debug('Process: %s' % item)
+                    # stick the item on a background
+                    full_im = Image.open(item)
+                    full_im = add_bg(full_im, bg, angle=angle)
+                    full_im.save('/tmp/toto.png') #FIXME change this
+                    shutil.copy('/tmp/toto.png', gen.__next__())
 
     #Part 3, ending
     if ending.path:
