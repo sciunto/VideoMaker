@@ -145,11 +145,11 @@ class VideoSection():
         self.repeat = repeat
 
 
-def prepare_pictures(tmp_path, opening, bodies, ending, tmp_loc=None):
+def prepare_pictures(output_dir, opening, bodies, ending, tmp_loc=None):
     """
     Put pictures in tmp_path with a correct name (sorted)
 
-    :param tmp_path: temporary path where final images are written
+    :param output_dir: path where final images are written before making the video
     :param opening: :class:`VideoSection` instance for opening
     :param bodies: :class:`VideoSection` instance for bodies
     :param ending: :class:`VideoSection` instance for ending
@@ -158,7 +158,7 @@ def prepare_pictures(tmp_path, opening, bodies, ending, tmp_loc=None):
     logger.info('Prepare pictures...')
     #TODO: setup this somewhere
     resolution = (800, 600)
-    gen = name_it(tmp_path)
+    gen = name_it(output_dir)
     # Background: auto-generated for the moment
     bg = Image.new("RGB", resolution, color=(0, 0, 0)) # Black.
     # Angle to rotate each image (for futher improvements)
