@@ -1,7 +1,7 @@
 {
     "meta" :
     {
-        "jsonversion" : "0.1"
+        "jsonversion" : 0.1
     },
     "movie" :
     {
@@ -13,7 +13,7 @@
         {
             "type" : "tex",
             "duration" : 3,
-            "path" : "opening"
+            "path" : "opening.tex"
         },
         "body1" :
         {
@@ -27,7 +27,7 @@
         {
             "type" : "tex",
             "duration" : 3,
-            "path" : "transition"
+            "path" : "transition.tex"
         },
         "body2" :
         {
@@ -41,7 +41,7 @@
         {
             "type" : "tex",
             "duration" : 3,
-            "path" : "ending"
+            "path" : "ending.tex"
         }
     }
 }
