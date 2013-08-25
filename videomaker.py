@@ -323,7 +323,7 @@ class Video():
         logging.debug('Move to %s' % cwd)
         shutil.copy('output.avi', os.path.join(cwd, output + '.avi'))
         #TODO: put this somewhere
-        #Delete the tmp dir
+        #Delete the self.pic_dir
         #logging.debug('Delete the tmp_dir %s' % tmp_path)
         #shutil.rmtree(tmp_path)
 
@@ -431,6 +431,7 @@ if __name__ == '__main__':
     cwd = os.getcwd()
     FPS = 25
     resolution = (800, 600)
+    correct_json_version = 0.1
 
     vid = Video(resolution, tmp_dir=args.tmp)
 
@@ -443,8 +444,10 @@ if __name__ == '__main__':
         conf = json.load(jsonfile, object_pairs_hook=OrderedDict)
         for section, value in conf.items():
             if section == 'meta':
-                logger.debug('json version: ' + value['jsonversion'])
-                #TODO check
+                logger.debug('detected json version: ' + value['jsonversion'])
+                if not value['jsonversion'] == correct_json_version:
+                    #FIXME: look for a better exception
+                    raise ValueError('Your jsonfile does not look to be at the correct version')
             if section == 'movie':
                 output = value['output']
             if section == 'data':
