@@ -108,36 +108,31 @@ def alphanum_key(s):
 #        self.repeat = repeat
 
 
-def make_slide(intro_dir, tmp_path, resolution=(1200, 800)):
+def make_slide(tex_path, tmp_path, resolution=(1200, 800)):
     """
     Make introduction png files
 
-    :param intro_dir: path to the dir containing a tex file
+    :param tex_path: path to the tex file
+    :param tmp_path: path to a tmp dir
     :param resolution: picture resolution of the slides
     :returns: png file path
     """
     logger.debug('Build a tex file')
     resol = str(resolution[0]) + 'x' + str(resolution[1])
 
-    tex_glob = glob.glob(os.path.abspath(intro_dir) + '/*tex')
-    if tex_glob == []:
-        return None
-    if len(tex_glob) > 1:
-        print('Error, non uniq tex file in %s' % intro_dir)
-        return None
-
-    filename = os.path.splitext(os.path.basename(tex_glob[0]))[0]
-    texfile = os.path.join(intro_dir, filename + '.tex')
+    filename = os.path.splitext(os.path.basename(tex_path))[0]
     #dvifile = os.path.join(tmp_path, filename + '.dvi')
     pdffile = os.path.join(tmp_path, filename + '.pdf')
     pngfile = os.path.join(tmp_path, filename + '.png')
 
     #command = ['/usr/bin/latex', '-output-directory=' + str(tmp_path), str(texfile)]
-    command = ['/usr/bin/pdflatex', '-output-directory=' + str(tmp_path), str(texfile)]
+    command = ['/usr/bin/pdflatex', '-output-directory=' + str(tmp_path), str(tex_path)]
+    logger.debug('Command: %s' % command)
     process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     stdout, stderr = process.communicate()
 
     command = ['/usr/bin/convert', '-density', '600', str(pdffile), '-resize', resol,  str(pngfile)]
+    logger.debug('Command: %s' % command)
     #command = ['/usr/bin/dvipng', '-o', str(pngfile), str(dvifile)]
     process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     stdout, stderr = process.communicate()
@@ -226,10 +221,6 @@ def make_slide(intro_dir, tmp_path, resolution=(1200, 800)):
 
 
 
-
-###########################
-
-#TODO: path : tex file directly
 
 class Video():
     """
@@ -444,7 +435,7 @@ if __name__ == '__main__':
         conf = json.load(jsonfile, object_pairs_hook=OrderedDict)
         for section, value in conf.items():
             if section == 'meta':
-                logger.debug('detected json version: ' + value['jsonversion'])
+                logger.debug('detected json version: ' + str(value['jsonversion']))
                 if not value['jsonversion'] == correct_json_version:
                     #FIXME: look for a better exception
                     raise ValueError('Your jsonfile does not look to be at the correct version')
