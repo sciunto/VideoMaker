@@ -148,9 +148,17 @@ class Video():
         self.pic_dir = tempfile.mkdtemp(dir=self.tmp_dir)
         self.generator = name_it(self.pic_dir)
 
+    def __del__(self):
+        #Delete the self.pic_dir
+        logging.debug('Delete the tmp_dir %s' % self.pic_dir)
+        shutil.rmtree(self.pic_dir)
+        logging.debug('Delete the tmp_dir %s' % self.tmp_dir)
+        shutil.rmtree(self.tmp_dir)
+
     def populate_with_slides(self, path, number):
         """
         Add slides to the tmp dir
+
         :param path: path to the tex file
         :param number: number of images #FIXME: time?
         """
@@ -233,10 +241,6 @@ class Video():
         #Copy the movie
         logging.debug('Move to %s' % cwd)
         shutil.copy('output.avi', os.path.join(cwd, output + '.avi'))
-        #TODO: put this somewhere
-        #Delete the self.pic_dir
-        #logging.debug('Delete the tmp_dir %s' % tmp_path)
-        #shutil.rmtree(tmp_path)
 
 
 if __name__ == '__main__':

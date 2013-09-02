@@ -1,9 +1,6 @@
 * Modify content for ending, body...
 
-* remove tmp dir after keybordinterupt
 * write a log in the output dir
-
-* Should put the tex file elsewhere
 
 * add resolution, method etc to json file
 * add optionaly acceleration in the corner
