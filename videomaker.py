@@ -32,6 +32,9 @@ def add_bg(im, bg, angle=0):
     Put image `im` on a background `bg`.
     Pre-rotate the image with an `angle`.
 
+    :param im: foreground image
+    :param bg: background image
+    :param angle: rotation angle
     """
     # Rotate the image
     if angle != 0:
