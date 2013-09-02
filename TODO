@@ -5,6 +5,10 @@
 
 * Should put the tex file elsewhere
 
+* add resolution, method etc to json file
+* add optionaly acceleration in the corner
+
+
 DONE:
 * Add frames between set of pictures?
 * Pick up 1 over N frames in the set of pictures (lightweight files)
