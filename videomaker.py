@@ -44,16 +44,23 @@ def add_bg(im, bg, angle=0):
     # Copy to do not overwrite bg
     wbg = bg.copy()
 
-    if im.size[1] > im.size[0]:
+    if im.size[1] / im.size[0] > wbg.size[1] / wbg.size[0]:
+        logger.debug('Case 1')
         # Match size along the vert. dir.
         ratio = wbg.size[1]/im.size[1]
         newsize = (math.floor(im.size[0]*ratio), wbg.size[1])
-        box = (math.floor(math.fabs(wbg.size[0]-im.size[0])/2), 0)
+        box = (math.floor(math.fabs(wbg.size[0]-newsize[0])/2), 0)
     else:
+        logger.debug('Case 2')
         ratio = wbg.size[0]/im.size[0]
         newsize = (wbg.size[0], math.floor(im.size[1]*ratio))
         box = (0, math.floor(math.fabs(wbg.size[1]-im.size[1])/2))
+        box = (0, math.floor(math.fabs(wbg.size[1]-newsize[1])/2))
 
+    logger.debug('im Size: %s' % str(im.size))
+    logger.debug('bg Size: %s' % str(wbg.size))
+    logger.debug('New Size: %s' % str(newsize))
+    logger.debug('Box: %s' % str(box))
     im = im.resize(newsize)
 
     wbg.paste(im, box=box)
