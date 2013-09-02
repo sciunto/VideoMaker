@@ -319,7 +319,7 @@ class Video():
                    '-vf', 'scale='+str(resolution[0])+':'+str(resolution[1]),
                    '-o', 'output.avi',
                    '-ovc', 'xvid',
-                   '-xvidencopts', 'bitrate=500'
+                   '-xvidencopts', 'bitrate=2048'
                    ]
         logging.debug('command: ' + str(command))
         process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
