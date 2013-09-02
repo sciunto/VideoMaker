@@ -16,7 +16,6 @@
 # Author: Francois Boulogne <fboulogne at sciunto dot org>, 2012
 
 import tempfile
-import glob
 import os.path
 import subprocess
 import re
