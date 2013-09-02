@@ -26,7 +26,7 @@ import math
 from PIL import Image
 
 
-def add_bg(im, bg, angle=0):
+def add_bg(im, bg, angle=0, method=Image.NEAREST):
     """
     Put image `im` on a background `bg`.
     Pre-rotate the image with an `angle`.
@@ -34,6 +34,7 @@ def add_bg(im, bg, angle=0):
     :param im: foreground image
     :param bg: background image
     :param angle: rotation angle
+    :param method: Method to resize images
     """
     # Rotate the image
     if angle != 0:
@@ -63,7 +64,7 @@ def add_bg(im, bg, angle=0):
     logger.debug('bg Size: %s' % str(wbg.size))
     logger.debug('New Size: %s' % str(newsize))
     logger.debug('Box: %s' % str(box))
-    im = im.resize(newsize)
+    im = im.resize(newsize, method)
 
     wbg.paste(im, box=box)
     return wbg
@@ -258,10 +259,14 @@ class Video():
                 shutil.copy(endfile, self.generator.__next__())
         shutil.rmtree(tmp_path)
 
-    def populate_with_pictures(self, path, number, repeat):
+    def populate_with_pictures(self, path, number, repeat, method=Image.NEAREST):
         """
         Add pictures to the tmp dir
+
         :param path: path to pictures
+        :param number:
+        :param repeat:
+        :param method: Method to resize images
         """
         # Background: auto-generated for the moment
         bg = Image.new("RGB", resolution, color=(0, 0, 0)) # Black.
@@ -281,7 +286,7 @@ class Video():
                     logger.debug('Process: %s' % item)
                     # stick the item on a background
                     full_im = Image.open(item)
-                    full_im = add_bg(full_im, bg, angle=angle)
+                    full_im = add_bg(full_im, bg, angle=angle, method=method)
                     print(tmp_file)
                     full_im.save(tmp_file)
                     for time in range(times):
@@ -295,12 +300,12 @@ class Video():
                     logger.debug('Process: %s' % item)
                     # stick the item on a background
                     full_im = Image.open(item)
-                    full_im = add_bg(full_im, bg, angle=angle)
+                    full_im = add_bg(full_im, bg, angle=angle, method=method)
                     full_im.save(tmp_file)
                     shutil.copy(tmp_file, self.generator.__next__())
         os.remove(tmp_file)
 
-    def make(self, cwd, output, fps=25):
+    def make(self, cwd, output, resolution, fps=25):
         """
         Build the video
 
@@ -311,7 +316,7 @@ class Video():
         logger.info('Generate the movie...')
         os.chdir(self.pic_dir)
         command = ['mencoder', 'mf://*.png', '-mf', 'fps='+str(fps),
-                   '-vf', 'scale=800:600',
+                   '-vf', 'scale='+str(resolution[0])+':'+str(resolution[1]),
                    '-o', 'output.avi',
                    '-ovc', 'xvid',
                    '-xvidencopts', 'bitrate=500'
@@ -434,7 +439,9 @@ if __name__ == '__main__':
     cwd = os.getcwd()
     FPS = 25
     resolution = (800, 600)
+    resolution = (1200, 800)
     correct_json_version = 0.1
+    method = Image.BICUBIC
 
     vid = Video(resolution, tmp_dir=args.tmp)
 
@@ -459,7 +466,6 @@ if __name__ == '__main__':
                         duration = subvalue['duration']
                         path = os.path.join(root_dir, subvalue['path'])
                         number = FPS * duration
-                        number = 1 #FIXME
                         vid.populate_with_slides(path, number)
                     elif subvalue['type'] == 'image':
                         path = os.path.join(root_dir, subvalue['path'])
@@ -468,9 +474,8 @@ if __name__ == '__main__':
                         repeat = subvalue['repeat']
 
                         number = FPS / inifps / speed
-                        number = 1 # FIXME
-                        vid.populate_with_pictures(path, number, repeat)
+                        vid.populate_with_pictures(path, number, repeat, method)
                     else:
                         raise ValueError('Wrong type')
 
-        vid.make(cwd, output=output, fps=FPS)
+        vid.make(cwd, output=output, fps=FPS, resolution=resolution)
