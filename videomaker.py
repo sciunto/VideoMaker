@@ -269,6 +269,7 @@ class Video():
         angle = 0
         pictures = sorted(os.listdir(path), key=alphanum_key)
         pictures = [os.path.join(path, item) for item in pictures]
+        # TODO: make sure each file is a picture
 
         tmp_file = tempfile.mkstemp(dir=self.tmp_dir, prefix='tmpImage', suffix='.png')[1]
         if number >= 1:
