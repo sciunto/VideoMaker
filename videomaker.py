@@ -275,6 +275,7 @@ class Video():
         if number >= 1:
             # duplicate the picture...
             times = math.floor(number)
+            logger.debug('Duplicate %s times' % times)
             for rep in range(repeat):
                 for item in pictures:
                     logger.debug('Process: %s' % item)
@@ -288,6 +289,7 @@ class Video():
         elif number < 1:
             # pick one every...
             every = math.floor(1 / number)
+            logger.debug('Use 1 image every %s' % every)
             for rep in range(repeat):
                 for item in pictures[::every]:
                     logger.debug('Process: %s' % item)
