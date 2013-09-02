@@ -40,7 +40,10 @@ An example of the configuration file and content of directories is available in 
 
     videomaker.py config.conf
 
+Ressources
+==========
 
+http://www.mplayerhq.hu/DOCS/HTML/fr/menc-feat-xvid.html
 
 Indices and tables
 ==================
