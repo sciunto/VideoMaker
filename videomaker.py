@@ -198,7 +198,6 @@ class Video():
                     # stick the item on a background
                     full_im = Image.open(item)
                     full_im = add_bg(full_im, bg, angle=angle, method=method)
-                    print(tmp_file)
                     full_im.save(tmp_file)
                     for time in range(times):
                         shutil.copy(tmp_file, self.generator.__next__())
