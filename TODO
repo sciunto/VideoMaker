@@ -6,6 +6,8 @@
 * add optionaly acceleration in the corner
 
 * Check disk space
+* use symlink when duplicated images are needed.
+* output with web format
 
 DONE:
 * Add frames between set of pictures?
