@@ -277,6 +277,8 @@ if __name__ == '__main__':
 
     root_dir = os.path.split(os.path.abspath(args.conf))[0]
     logger.debug('root_dir: %s' % root_dir)
+
+    logger.info('Preparing...')
     with open(args.conf, 'r') as jsonfile:
         conf = json.load(jsonfile, object_pairs_hook=OrderedDict)
         for section, value in conf.items():
@@ -289,6 +291,7 @@ if __name__ == '__main__':
                 output = value['output']
             if section == 'data':
                 for subsection, subvalue in value.items():
+                    logger.info('[' + subsection + ']')
                     if subvalue['type'] == 'tex':
                         duration = subvalue['duration']
                         path = os.path.join(root_dir, subvalue['path'])
@@ -299,7 +302,6 @@ if __name__ == '__main__':
                         inifps = subvalue['inifps']
                         speed = subvalue['speed']
                         repeat = subvalue['repeat']
-
                         number = FPS / inifps / speed
                         vid.populate_with_pictures(path, number, repeat, method)
                     else:
