@@ -4,6 +4,7 @@
 
 * add resolution, method etc to json file
 * add optionaly acceleration in the corner
+* add option first image black
 
 * Check disk space
 * use symlink when duplicated images are needed.
