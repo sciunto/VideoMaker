@@ -189,6 +189,7 @@ class Video():
 
         tmp_file = tempfile.mkstemp(dir=self.tmp_dir, prefix='tmpImage', suffix='.png')[1]
         if number >= 1:
+            gen_dest = None
             # duplicate the picture...
             times = math.floor(number)
             logger.debug('Duplicate %s times' % times)
@@ -200,7 +201,14 @@ class Video():
                     full_im = add_bg(full_im, bg, angle=angle, method=method)
                     full_im.save(tmp_file)
                     for time in range(times):
-                        shutil.copy(tmp_file, self.generator.__next__())
+                        prev_gen_dest = gen_dest
+                        gen_dest = self.generator.__next__()
+                        if time == 0:
+                            # First time, copy
+                            shutil.copy(tmp_file, gen_dest)
+                        else:
+                            # Duplicate and preserve disk space
+                            os.link(prev_gen_dest, gen_dest)
         elif number < 1:
             # pick one every...
             every = math.floor(1 / number)
