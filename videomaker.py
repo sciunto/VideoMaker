@@ -273,12 +273,9 @@ if __name__ == '__main__':
 
     cwd = os.getcwd()
     FPS = 25
-    resolution = (800, 600)
-    resolution = (1200, 800)
-    correct_json_version = 0.1
+    correct_json_version = '0.1.1'
     method = Image.BICUBIC
 
-    vid = Video(resolution, tmp_dir=args.tmp)
 
     import json
     from collections import OrderedDict
@@ -297,6 +294,8 @@ if __name__ == '__main__':
                     raise ValueError('Your jsonfile does not look to be at the correct version')
             if section == 'movie':
                 output = value['output']
+                resolution = (value['hor_resolution'], value['ver_resolution'])
+                vid = Video(resolution, tmp_dir=args.tmp)
             if section == 'data':
                 for subsection, subvalue in value.items():
                     logger.info('[' + subsection + ']')

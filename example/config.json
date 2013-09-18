@@ -1,11 +1,13 @@
 {
     "meta" :
     {
-        "jsonversion" : 0.1
+        "jsonversion" : "0.1.1"
     },
     "movie" :
     {
-        "output" : "myvideo"
+        "output" : "myvideo",
+        "hor_resolution" : 1200,
+        "ver_resolution" : 800
     },
     "data" :
     {

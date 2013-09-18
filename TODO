@@ -2,7 +2,6 @@
 
 * write a log in the output dir
 
-* add resolution, method etc to json file
 * add optionaly acceleration in the corner
 * add option first image black
 
