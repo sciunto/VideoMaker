@@ -1,11 +1,12 @@
 ============
-Version 0.
+Version 0.2 2013-09-22
 ============
 * Change framerate handling for body
 * New command for building the movie
 * user can specify the tmp directory
 * Put a background behind the movie
 * ENH: link when duplicate images (faster, less disk usage)
+* ogv output
 
 ============
 Version 0.1 2012-11-13
