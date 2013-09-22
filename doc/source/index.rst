@@ -24,21 +24,14 @@ Contents:
 How to install
 ==============
 
-    python setup.py install --root=/usr/local/bin
-
-You must install before:
-
-* python3
-* pillow
-* latex, dvipng, beamer class...
-* mencoder
+See :doc:`install`.
 
 How to run
 ==========
 
 An example of the configuration file and content of directories is available in example/
 
-    videomaker.py config.conf
+    videomaker.py config.json
 
 Ressources
 ==========
