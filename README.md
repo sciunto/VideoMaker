@@ -8,3 +8,5 @@ Doc
 ===
 
 https://videomaker.readthedocs.org
+
+Instructions to install the software are provided there.
