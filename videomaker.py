@@ -225,14 +225,16 @@ class Video():
 
     def make(self, cwd, output, resolution, fps=25):
         """
-        Build the video
+        Build the video (avi + ogv)
 
         :param fps: frame per second
         """
 
-        #Encode the movie
         logger.info('Generate the movie...')
         os.chdir(self.pic_dir)
+
+        # Encode the movie (avi)
+        logger.info('[avi]')
         command = ['mencoder', 'mf://*.png', '-mf', 'fps='+str(fps),
                    '-vf', 'scale='+str(resolution[0])+':'+str(resolution[1]),
                    '-o', 'output.avi',
@@ -245,9 +247,28 @@ class Video():
         logging.debug(stdout.decode('utf8'))
         logging.warning(stderr.decode('utf8'))
 
+
+        # Encode the movie (ogv)
+        logger.info('[ogv]')
+        command = ['ffmpeg',
+                   '-i', 'output.avi',
+                   '-s', '448x336',
+                   '-f', 'ogg',
+                   '-vcodec', 'libtheora',
+                   '-acodec', 'libvorbis',
+                   '-b:v', '900k',
+                   '-b:a', '128k',
+                   'output.ogv']
+        logging.debug('command: ' + str(command))
+        process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        stdout, stderr = process.communicate()
+        logging.debug(stdout.decode('utf8'))
+        logging.warning(stderr.decode('utf8'))
+
         #Copy the movie
-        logging.debug('Move to %s' % cwd)
-        shutil.copy('output.avi', os.path.join(cwd, output + '.avi'))
+        for ext in ('.avi', '.ogv'):
+            logging.debug('Move output%s to %s', (ext, cwd))
+            shutil.copy('output' + ext, os.path.join(cwd, output + ext))
 
 
 if __name__ == '__main__':
