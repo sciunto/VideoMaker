@@ -8,7 +8,7 @@ NAME = "VideoMaker"
 URL = "https://github.com/sciunto/VideoMaker"
 LICENSE = "GPLv3+"
 EMAIL = "fboulogne@sciunto.org"
-VERSION = "0.1"
+VERSION = "0.2"
 
 SHORT_DESCRIPTION = "VideoMaker builds a movie from pictures"
 
