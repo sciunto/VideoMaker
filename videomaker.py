@@ -132,6 +132,13 @@ def make_slide(tex_path, tmp_path, resolution=(1200, 800)):
     #command = ['/usr/bin/dvipng', '-o', str(pngfile), str(dvifile)]
     process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     stdout, stderr = process.communicate()
+
+    #TODO: integrate that to the API
+    bg = Image.new("RGB", resolution, color=(0, 0, 0)) # Black.
+    full_im = Image.open(pngfile)
+    full_im = add_bg(full_im, bg, angle=0, method=Image.NEAREST)
+    full_im.save(pngfile)
+
     return pngfile
 
 
@@ -241,6 +248,10 @@ class Video():
                    '-ovc', 'xvid',
                    '-xvidencopts', 'bitrate=2048'
                    ]
+        #TODO switch to ffmpeg
+        command = ['ffmpeg', '-framerate', str(fps), '-i', '%06d.png', '-c:v', 
+                   'libx264', '-r', '30', '-vf', 'scale='+str(resolution[0])+':'+str(resolution[1])+',setsar=1:1',
+                   '-pix_fmt', 'yuv420p', 'output.avi']
         logging.debug('command: ' + str(command))
         process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         stdout, stderr = process.communicate()
